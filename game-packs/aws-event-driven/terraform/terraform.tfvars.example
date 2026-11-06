@@ -1,0 +1,5 @@
+use_floci          = true
+endpoint_url       = "http://localhost:4566"
+lambda_endpoint_url = "http://floci:4566"
+name_prefix        = "arena-team-01"
+fail_payments      = false
