@@ -7,6 +7,10 @@ on:
       - master
   workflow_dispatch:
 
+permissions:
+  id-token: write
+  contents: read
+
 jobs:
   terraform:
     runs-on: ubuntu-latest
@@ -19,17 +23,23 @@ jobs:
         with:
           terraform_version: 1.5.0
 
-      - name: Terraform Plan / Validate
-        env:
-          ARENA_EVENT_ID: ${{ vars.ARENA_EVENT_ID }}
-          ARENA_OPERATION: plan
+      - name: Arena AWS Credentials Setup (Plan)
+        uses: cloudops-arena/action-setup@v1
+        with:
+          arena_event_id: ${{ vars.ARENA_EVENT_ID }}
+          arena_operation: plan
+
+      - name: Terraform Init & Plan
         run: |
           terraform init
           terraform plan
 
+      - name: Arena AWS Credentials Setup (Deploy)
+        uses: cloudops-arena/action-setup@v1
+        with:
+          arena_event_id: ${{ vars.ARENA_EVENT_ID }}
+          arena_operation: deploy
+
       - name: Terraform Deploy
-        env:
-          ARENA_EVENT_ID: ${{ vars.ARENA_EVENT_ID }}
-          ARENA_OPERATION: deploy
         run: |
           terraform apply -auto-approve
