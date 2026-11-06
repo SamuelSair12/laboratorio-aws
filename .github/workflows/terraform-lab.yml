@@ -1,0 +1,35 @@
+name: Terraform Lab Workflow
+
+on:
+  push:
+    branches:
+      - main
+      - master
+  workflow_dispatch:
+
+jobs:
+  terraform:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.5.0
+
+      - name: Terraform Plan / Validate
+        env:
+          ARENA_EVENT_ID: ${{ vars.ARENA_EVENT_ID }}
+          ARENA_OPERATION: plan
+        run: |
+          terraform init
+          terraform plan
+
+      - name: Terraform Deploy
+        env:
+          ARENA_EVENT_ID: ${{ vars.ARENA_EVENT_ID }}
+          ARENA_OPERATION: deploy
+        run: |
+          terraform apply -auto-approve
